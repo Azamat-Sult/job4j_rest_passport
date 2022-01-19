@@ -1,6 +1,7 @@
 package ru.job4j.passport.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -17,13 +18,8 @@ public class PassportControllerApi {
 
     private final RestTemplate restTemplate;
 
-    private static final String API_PASSPORT_SAVE = "http://localhost:8080/passport/save";
-    private static final String API_PASSPORT_UPDATE = "http://localhost:8080/passport/update";
-    private static final String API_PASSPORT_DELETE = "http://localhost:8080/passport/delete?id={id}";
-    private static final String API_PASSPORT_FIND_ALL = "http://localhost:8080/passport/find-all";
-    private static final String API_PASSPORT_FIND_BY_SERIES = "http://localhost:8080/passport/find?series={series}";
-    private static final String API_PASSPORT_FIND_UNAVAILABLE = "http://localhost:8080/passport/unavailable";
-    private static final String API_PASSPORT_FIND_REPLACEABLE = "http://localhost:8080/passport/find-replaceable";
+    @Value("${passportURL}")
+    private String passportURL;
 
     @Autowired
     public PassportControllerApi(RestTemplate restTemplate) {
@@ -32,7 +28,7 @@ public class PassportControllerApi {
 
     @PostMapping("/save")
     public ResponseEntity<Passport> save(@RequestBody Passport passport) {
-        Passport rsl = restTemplate.postForObject(API_PASSPORT_SAVE, passport, Passport.class);
+        Passport rsl = restTemplate.postForObject(passportURL + "/save", passport, Passport.class);
         return new ResponseEntity<>(
                 rsl,
                 HttpStatus.CREATED
@@ -41,20 +37,20 @@ public class PassportControllerApi {
 
     @PutMapping("/update")
     public ResponseEntity<Void> update(@RequestBody Passport passport) {
-        restTemplate.put(API_PASSPORT_UPDATE, passport);
+        restTemplate.put(passportURL + "/update", passport);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deletePerson(@RequestParam int id) {
-        restTemplate.delete(API_PASSPORT_DELETE, id);
+    public ResponseEntity<Void> delete(@RequestParam int id) {
+        restTemplate.delete(passportURL + "/delete?id={id}", id);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/find-all")
-    public List<Passport> findAllPerson() {
+    public List<Passport> findAll() {
         return restTemplate.exchange(
-                API_PASSPORT_FIND_ALL,
+                passportURL + "/find-all",
                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Passport>>() { }
         ).getBody();
     }
@@ -62,7 +58,7 @@ public class PassportControllerApi {
     @GetMapping("/find")
     public List<Passport> findBySeries(@RequestParam int series) {
         return restTemplate.exchange(
-                API_PASSPORT_FIND_BY_SERIES,
+                passportURL + "/find?series={series}",
                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Passport>>() { }, series
         ).getBody();
     }
@@ -70,7 +66,7 @@ public class PassportControllerApi {
     @GetMapping("/unavailable")
     public List<Passport> findUnAvailable() {
         return restTemplate.exchange(
-                API_PASSPORT_FIND_UNAVAILABLE,
+                passportURL + "/unavailable",
                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Passport>>() { }
         ).getBody();
     }
@@ -78,7 +74,7 @@ public class PassportControllerApi {
     @GetMapping("/find-replaceable")
     public List<Passport> findReplaceable() {
         return restTemplate.exchange(
-                API_PASSPORT_FIND_REPLACEABLE,
+                passportURL + "/find-replaceable",
                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Passport>>() { }
         ).getBody();
     }

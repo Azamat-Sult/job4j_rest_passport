@@ -3,21 +3,36 @@ package ru.job4j.passport.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.Objects;
 
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"series", "number"})})
 public class Passport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Min(value = 0, message = "Id must not be negative")
     private int id;
+    @Min(value = 0, message = "Passport series should not be less than 0")
+    @Max(value = 9999, message = "Passport series should not be greater than 9999")
+    @NotNull(message = "Passport series cannot be null")
     private int series;
+    @Min(value = 0, message = "Passport number should not be less than 0")
+    @Max(value = 999999, message = "Passport number should not be greater than 999999")
+    @NotNull(message = "Passport number cannot be null")
     private int number;
+    @NotBlank(message = "Name must be not empty")
     private String name;
+    @NotBlank(message = "Surname must be not empty")
     private String surName;
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "dd.MM.yyyy")
+    @NotNull(message = "Passport expire date cannot be null")
     private Calendar expires;
 
     public static Passport of(int series, int number, String name,

@@ -1,7 +1,9 @@
 package ru.job4j.passport.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.job4j.passport.model.Passport;
 import ru.job4j.passport.repository.PassportRepository;
 
@@ -22,13 +24,14 @@ public class PassportService {
         return passport;
     }
 
-    public boolean deleteById(int id) {
+    public void deleteById(int id) {
+        validateId(id);
         Optional<Passport> passport = repository.findById(id);
         if (passport.isPresent()) {
             repository.delete(passport.get());
-            return true;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found. Please, check id");
         }
-        return false;
     }
 
     public List<Passport> findAll() {
@@ -36,6 +39,7 @@ public class PassportService {
     }
 
     public List<Passport> findBySeries(int series) {
+        validateSeries(series);
         return repository.findBySeries(series);
     }
 
@@ -51,6 +55,18 @@ public class PassportService {
 
     public void deleteAll() {
         repository.deleteAll();
+    }
+
+    private void validateId(int id) {
+        if (id < 1) {
+            throw new NullPointerException("Passport id can`t be less than 1");
+        }
+    }
+
+    private void validateSeries(int series) {
+        if (series < 0 || series > 9999) {
+            throw new NullPointerException("Passport series should be 0 - 9999");
+        }
     }
 
 }

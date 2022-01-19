@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.job4j.passport.model.Passport;
 import ru.job4j.passport.service.PassportService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -21,21 +22,21 @@ public class PassportController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<Passport> save(@RequestBody Passport passport) {
+    public ResponseEntity<Passport> save(@Valid @RequestBody Passport passport) {
         passport = passportService.save(passport);
         return new ResponseEntity<>(passport, HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Void> update(@RequestBody Passport passport) {
+    public ResponseEntity<Void> update(@Valid @RequestBody Passport passport) {
         passportService.save(passport);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteById(@RequestParam int id) {
-        boolean rsl = passportService.deleteById(id);
-        return new ResponseEntity<>(rsl ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+        passportService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/find-all")

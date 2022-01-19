@@ -49,6 +49,7 @@ class PassportControllerTest {
         Passport newPassport = Passport.of(1234, 123456, "user1", "user1", date);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         mockMvc.perform(post("/passport/save")
                         .content(objectMapper.writeValueAsString(newPassport))
