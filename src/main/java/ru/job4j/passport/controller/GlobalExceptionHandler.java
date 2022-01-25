@@ -34,15 +34,6 @@ public class GlobalExceptionHandler {
         }}));
     }
 
-    @ExceptionHandler(value = {ResponseStatusException.class})
-    public void handleExceptionRSE(Exception e, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setStatus(HttpStatus.NOT_FOUND.value());
-        response.setContentType("application/json");
-        response.getWriter().write(objectMapper.writeValueAsString(new HashMap<>() { {
-            put("details", e.getMessage());
-        }}));
-    }
-
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
     public ResponseEntity<?> handle(MethodArgumentNotValidException e) {
         return ResponseEntity.badRequest().body(
