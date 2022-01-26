@@ -2,6 +2,9 @@ package ru.job4j.passport.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.job4j.passport.model.Passport;
@@ -10,13 +13,18 @@ import ru.job4j.passport.repository.PassportRepository;
 import java.util.*;
 
 @Service
+@EnableScheduling
 public class PassportService {
 
     private final PassportRepository repository;
 
+    private final KafkaTemplate<Integer, Passport> kafkaTemplate;
+
     @Autowired
-    public PassportService(PassportRepository repository) {
+    public PassportService(PassportRepository repository,
+                           KafkaTemplate<Integer, Passport> kafkaTemplate) {
         this.repository = repository;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     public Passport save(Passport passport) {
@@ -66,6 +74,16 @@ public class PassportService {
     private void validateSeries(int series) {
         if (series < 0 || series > 9999) {
             throw new NullPointerException("Passport series should be 0 - 9999");
+        }
+    }
+
+    @Scheduled(fixedDelayString = "${sendInterval}")
+    public void sendUnAvailableViaKafka() {
+        List<Passport> unAvailable = findUnAvailable();
+        if (!unAvailable.isEmpty()) {
+            for (Passport passport : unAvailable) {
+                kafkaTemplate.send("unAvailable", passport);
+            }
         }
     }
 

@@ -115,7 +115,7 @@ public class Passport {
     public String toString() {
         return "Passport { " + "id=" + id + ", series=" + series
                 + ", number=" + number + ", name='" + name
-                + "', surName='" + surName + "', expires=" + expires + " }";
+                + "', surName='" + surName + "', expires=" + expires.getTime() + " }";
     }
 
 }
