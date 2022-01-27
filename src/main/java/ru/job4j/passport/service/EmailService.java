@@ -14,7 +14,9 @@ public class EmailService {
 
     @KafkaListener(topics = "unAvailable")
     public void unAvailableListener(ConsumerRecord<Long, Passport> record) {
-        System.out.print(new GregorianCalendar().getTime() + " - Expired passport found: ");
+        System.out.print("E-mail service: "
+                + new GregorianCalendar().getTime()
+                + " - Expired passport received: ");
         System.out.println(record.value());
     }
 

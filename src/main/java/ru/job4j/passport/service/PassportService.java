@@ -82,6 +82,9 @@ public class PassportService {
         List<Passport> unAvailable = findUnAvailable();
         if (!unAvailable.isEmpty()) {
             for (Passport passport : unAvailable) {
+                System.out.println("Passport service: "
+                        + new GregorianCalendar().getTime()
+                        + " - Expired passport sent...");
                 kafkaTemplate.send("unAvailable", passport);
             }
         }
